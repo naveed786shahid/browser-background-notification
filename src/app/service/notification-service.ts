@@ -34,23 +34,23 @@ export class NotificationService {
   async registerPeriodicSync() {
     if ('serviceWorker' in navigator) {
       try {
-        const registration: any = await navigator.serviceWorker.ready;
+        // First, register the service worker if it's not already registered
+        const registration = await navigator.serviceWorker.register('/service-worker.js');
+        console.log('Service Worker registered:', registration);
+  
+        // Check if periodic sync is supported
+        const serviceWorkerRegistration  :any= await navigator.serviceWorker.ready;
         
-        if ('periodicSync' in registration) {
-          await registration.periodicSync.register('periodic-notification', {
-            minInterval: 60 * 1000, // Minimum allowed interval: 1 minute
+        if ('periodicSync' in serviceWorkerRegistration) {
+          // Register periodic sync
+          await serviceWorkerRegistration.periodicSync.register('periodic-notification', {
+            minInterval: 60 * 1000, // 1 minute interval
           });
           console.log("Periodic sync registered");
         } else {
           console.log("Periodic Sync is not supported in this browser.");
         }
-        navigator.serviceWorker.register('/service-worker.js')
-        .then(registration => {
-          console.log('Service Worker registered:', registration);
-        })
-        .catch(error => {
-          console.error('Service Worker registration failed:', error);
-        });
+        
       } catch (error) {
         console.error("Service Worker registration failed:", error);
       }
@@ -58,6 +58,7 @@ export class NotificationService {
       console.warn('Service workers are not supported in this environment.');
     }
   }
+  
   
   
   

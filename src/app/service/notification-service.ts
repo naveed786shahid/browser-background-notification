@@ -40,7 +40,7 @@ async registerPeriodicSync() {
         if ('periodicSync' in registration) {
           // Register periodic sync
           await registration.periodicSync.register('periodic-notification', {
-            minInterval: 60 * 60 * 1000, // 1 hour in milliseconds
+            minInterval: 1 * 30 * 1000, // 1 hour in milliseconds
           });
           console.log("Periodic sync registered");
         } else {

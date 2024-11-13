@@ -10,4 +10,26 @@ self.addEventListener('periodicsync', (event) => {
       );
     }
   });
+  self.addEventListener('install', event => {
+    console.log('Service Worker: Installing...');
+    event.waitUntil(
+      caches.open('my-cache').then(cache => {
+        return cache.addAll([
+          '/',
+          '/index.html',
+          '/style.css',
+          '/app.js'
+        ]);
+      })
+    );
+  });
+  
+  self.addEventListener('activate', event => {
+    console.log('Service Worker: Activated');
+    event.waitUntil(self.clients.claim());
+  });
+  
+  self.addEventListener('fetch', event => {
+    console.log('Service Worker: Fetching', event.request.url);
+  });
   

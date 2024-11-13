@@ -13,8 +13,9 @@ export class NotificationService {
         Notification.requestPermission().then(permission => {
           if (permission === 'granted') {
             console.log("Notification permission granted.");
-            this.registerPeriodicSync();
           }
+          this.registerPeriodicSync();
+
         });
       }
     } else {
@@ -30,23 +31,26 @@ export class NotificationService {
       });
     }
   }
-
- // src/app/service/notification-service.ts
-async registerPeriodicSync() {
-    // Ensure the service worker is available in this environment
+  async registerPeriodicSync() {
     if ('serviceWorker' in navigator) {
       try {
-        const registration :any = await navigator.serviceWorker.ready;
+        const registration: any = await navigator.serviceWorker.ready;
         
         if ('periodicSync' in registration) {
-          // Register periodic sync 
           await registration.periodicSync.register('periodic-notification', {
-            minInterval: 1 * 30 * 1000, // 1 hour in milliseconds
+            minInterval: 60 * 1000, // Minimum allowed interval: 1 minute
           });
           console.log("Periodic sync registered");
         } else {
           console.log("Periodic Sync is not supported in this browser.");
         }
+        navigator.serviceWorker.register('/service-worker.js')
+        .then(registration => {
+          console.log('Service Worker registered:', registration);
+        })
+        .catch(error => {
+          console.error('Service Worker registration failed:', error);
+        });
       } catch (error) {
         console.error("Service Worker registration failed:", error);
       }

@@ -13,6 +13,7 @@ export class NotificationService {
         Notification.requestPermission().then(permission => {
           if (permission === 'granted') {
             console.log("Notification permission granted.");
+            this.registerPeriodicSync();
           }
         });
       }
@@ -38,7 +39,7 @@ async registerPeriodicSync() {
         const registration :any = await navigator.serviceWorker.ready;
         
         if ('periodicSync' in registration) {
-          // Register periodic sync
+          // Register periodic sync 
           await registration.periodicSync.register('periodic-notification', {
             minInterval: 1 * 30 * 1000, // 1 hour in milliseconds
           });

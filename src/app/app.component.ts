@@ -23,7 +23,7 @@ export class AppComponent {
         // This will run only in the browser and ensures it's within the Angular zone
         console.log(navigator.userAgent,'SGENEEEE');
         this.notificationService.requestPermission();
-        this.notificationService.registerPeriodicSync();
+      //  this.notificationService.registerPeriodicSync();
       });
     }
   }

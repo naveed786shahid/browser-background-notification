@@ -13,11 +13,13 @@ export class NotificationService {
         Notification.requestPermission().then(permission => {
           if (permission === 'granted') {
             console.log("Notification permission granted.");
+            this.registerPeriodicSync();
+
           }
-          this.registerPeriodicSync();
 
         });
-      }
+      }else          this.registerPeriodicSync();
+
     } else {
       console.warn('Notifications are not supported in this environment.');
     }

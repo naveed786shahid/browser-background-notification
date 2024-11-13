@@ -38,7 +38,7 @@ export class NotificationService {
       try {
         // First, register the service worker if it's not already registered
        // const registration = await navigator.serviceWorker.register(`${window.location.origin}/service-worker.js`);
-        const registration = await navigator.serviceWorker.register('./ngsw-worker.js');
+        const registration = await navigator.serviceWorker.register('./assets/ngsw-worker.js');
         console.log('Service Worker registered:', registration);
   
         // Check if periodic sync is supported

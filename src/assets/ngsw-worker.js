@@ -7,7 +7,7 @@ self.addEventListener('periodicsync', (event) => {
       event.waitUntil(
         self.registration.showNotification('Reminder', {
           body: 'This is your scheduled notification!',
-          icon: 'https://example.com/notification-icon.png'  // Optional icon
+          icon: './assets/icon-96x96.png'  // Optional icon
         })
       );
     }

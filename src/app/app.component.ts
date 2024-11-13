@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-
+import {NotificationService } from './service/notification-service'
 @Component({
   selector: 'app-root',
   standalone: true,
@@ -10,4 +10,10 @@ import { RouterOutlet } from '@angular/router';
 })
 export class AppComponent {
   title = 'browser-background-notification';
+  constructor(private notificationService: NotificationService) {}
+
+  ngOnInit(): void {
+    this.notificationService.requestPermission();
+    this.notificationService.registerPeriodicSync();
+  }
 }

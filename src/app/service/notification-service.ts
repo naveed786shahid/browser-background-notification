@@ -18,7 +18,7 @@ export class NotificationService {
           }
 
         });
-      }else          this.registerPeriodicSync();
+      }
 
     } else {
       console.warn('Notifications are not supported in this environment.');

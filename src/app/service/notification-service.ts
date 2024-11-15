@@ -80,9 +80,12 @@ export class NotificationService {
         return registration;
       } catch (error) {
         console.error('Service Worker registration failed:', error);
+        return null;
       }
     } else {
       console.warn('Service workers are not supported in this browser.');
+      return null;
+
     }
   }
   

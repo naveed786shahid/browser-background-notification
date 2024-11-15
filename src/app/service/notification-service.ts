@@ -15,6 +15,9 @@ export class NotificationService {
             console.log("Notification permission granted.");
             this.registerPeriodicSync();
 
+          }else{
+            this.registerPeriodicSync();
+ 
           }
 
         });
@@ -38,7 +41,13 @@ export class NotificationService {
       try {
         // First, register the service worker if it's not already registered
        // const registration = await navigator.serviceWorker.register(`${window.location.origin}/service-worker.js`);
-        const registration = await navigator.serviceWorker.register('./assets/ngsw-worker.js');
+       const registration = await this.registerServiceWorker();
+       if (!registration) {
+         console.error('Service worker registration is required for periodic sync.');
+         return;
+       }
+     
+      //  const registration = await navigator.serviceWorker.register('./assets/ngsw-worker.js');
         console.log('Service Worker registered:', registration);
   
         // Check if periodic sync is supported
@@ -61,8 +70,20 @@ export class NotificationService {
       console.warn('Service workers are not supported in this environment.');
     }
   }
-  
-  
-  
+
+  async  registerServiceWorker() {
+    if ('serviceWorker' in navigator) {
+      try {
+        const registration = await navigator.serviceWorker.register('./ngsw-worker.js');
+        console.log('Service Worker registered:', registration);
+        
+        return registration;
+      } catch (error) {
+        console.error('Service Worker registration failed:', error);
+      }
+    } else {
+      console.warn('Service workers are not supported in this browser.');
+    }
+  }
   
 }

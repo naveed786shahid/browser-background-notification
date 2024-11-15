@@ -1,0 +1,27 @@
+import { Injectable } from '@angular/core';
+import { AngularFireMessaging } from '@angular/fire/compat/messaging';
+import { mergeMapTo } from 'rxjs/operators';
+
+@Injectable({
+  providedIn: 'root',
+})
+export class FirebaseNotificationService {
+  constructor(private afMessaging: AngularFireMessaging) {}
+
+  requestPermission() {
+    this.afMessaging.requestToken.subscribe(
+      (token) => {
+        console.log('Permission granted! Save this token to your server:', token);
+      },
+      (error) => {
+        console.error('Permission denied', error);
+      }
+    );
+  }
+
+  listen() {
+    this.afMessaging.messages.subscribe((message) => {
+      console.log('Message received:', message);
+    });
+  }
+}

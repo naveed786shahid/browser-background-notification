@@ -1,13 +1,46 @@
 // src/app/service/notification-service.ts
-import { Injectable } from '@angular/core';
+import { Injectable,Inject } from '@angular/core';
+import { AngularFireMessaging } from '@angular/fire/compat/messaging';
+import { Messaging, onMessage ,getToken} from '@angular/fire/messaging';
+import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
 export class NotificationService {
-  constructor() {}
+  constructor(private messaging: Messaging) {}
+  private token :any = new BehaviorSubject<string>('');
+  public myString$ = this.token.asObservable();
+  updateString(newValue: any): void {
+    this.token.next(newValue); // Update the value
+  }
+  requestPermission() {
+    if (typeof window !== 'undefined' && 'Notification' in window) 
+    Notification.requestPermission()
+      .then((permission) => {
+        if (permission === 'granted') {
+          console.log('Notification permission granted.');
+          this.getDeviceToken();  // Call getDeviceToken after permission is granted
 
-  requestPermission(): void {
+        } else {
+          console.warn('Notification permission denied.');
+        }
+      })
+      .catch((err) => console.error('Error requesting notification permission:', err));
+  }
+
+  listen() {
+
+    onMessage(this.messaging, (payload:any) => {
+      console.log('Message received. ', payload);
+
+      // Optionally display the notification using the Notification API
+      new Notification(payload.notification.title, {
+        body: payload.notification.body,
+      });
+    });
+  }
+  requestPermission1(): void {
     if (typeof window !== 'undefined' && 'Notification' in window) {
       if (Notification.permission !== 'granted' && Notification.permission !== 'denied') {
         Notification.requestPermission().then(permission => {
@@ -15,19 +48,35 @@ export class NotificationService {
             console.log("Notification permission granted.");
             this.registerPeriodicSync();
 
-          }else{
-            this.registerPeriodicSync();
- 
           }
-
         });
+      }else{
+        this.registerPeriodicSync();
+
       }
+
 
     } else {
       console.warn('Notifications are not supported in this environment.');
     }
   }
-
+  getDeviceToken() {
+    getToken(this.messaging, {
+      vapidKey: 'BLyPYSrJZFbENiQJNjx5S82yn8RnNwja4m_Zu39WWUNMCRQKW98rVSKY5mhc3HRFVCFR_-6hfcv6mzFcXANLofg',
+    })
+      .then((token:any) => {
+        if (token) {
+          console.log('Device Token:', token);
+          this.updateString(token)
+          // Save this token to your server for future use
+        } else {
+          console.warn('No device token available. User may not have granted permission.');
+        }
+      })
+      .catch((error) => {
+        console.error('Error retrieving device token:', error);
+      });
+  }
   showNotification(title: string, body: string): void {
     if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'granted') {
       new Notification(title, {
@@ -36,11 +85,8 @@ export class NotificationService {
       });
     }
   }
-  async registerPeriodicSync() {
-    if ('serviceWorker' in navigator) {
+  async registerPeriodicSync1() {
       try {
-        // First, register the service worker if it's not already registered
-       // const registration = await navigator.serviceWorker.register(`${window.location.origin}/service-worker.js`);
        const registration = await this.registerServiceWorker();
        if (!registration) {
          console.error('Service worker registration is required for periodic sync.');
@@ -66,15 +112,35 @@ export class NotificationService {
       } catch (error) {
         console.error("Service Worker registration failed:", error);
       }
-    } else {
-      console.warn('Service workers are not supported in this environment.');
-    }
+    
   }
 
+  async  registerPeriodicSync() {
+    const registration :any= await this.registerServiceWorker();
+    if (!registration) {
+      console.error('Service worker registration is required for periodic sync.');
+      return;
+    }
+  
+    if ('periodicSync' in registration) {
+      try {
+        await registration.periodicSync.register('periodic-notification', {
+          minInterval: 60 * 1000, // Minimum interval is 1 minute
+        });
+        console.log('Periodic sync registered successfully');
+      } catch (error) {
+        console.error('Failed to register periodic sync:', error);
+      }
+    } else {
+      console.log('Periodic Sync is not supported in this browser.');
+    }
+  }
+  
+  
   async  registerServiceWorker() {
     if ('serviceWorker' in navigator) {
       try {
-        const registration = await navigator.serviceWorker.register('./ngsw-worker.js');
+        const registration = await navigator.serviceWorker.register('./assets/ngsw-worker.js');
         console.log('Service Worker registered:', registration);
         
         return registration;
